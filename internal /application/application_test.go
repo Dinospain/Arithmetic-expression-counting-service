@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Dinospain/Arithmetic-expression-counting-servicepkg/calculation"
+	"github.com/Dinospain/Arithmetic-expression-counting-service/pkg/calculation"
 )
 
 func TestConfigFromEnv(t *testing.T) {
