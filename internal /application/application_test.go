@@ -62,12 +62,12 @@ func TestCalcHandler(t *testing.T) {
 		res := rec.Result()
 		defer res.Body.Close()
 
-		if res.StatusCode != http.StatusOK {
-			t.Errorf("expected status 200, got %d", res.StatusCode)
+		if res.StatusCode != http.StatusBadRequest {
+			t.Errorf("expected status 400, got %d", res.StatusCode)
 		}
 
 		body, _ := io.ReadAll(res.Body)
-		if !strings.Contains(string(body), "err: expression is not valid") {
+		if !strings.Contains(string(body), "err: calculation failed") {
 			t.Errorf("unexpected response body: %s", body)
 		}
 	})
@@ -132,3 +132,4 @@ func TestApplicationRunServer(t *testing.T) {
 		t.Errorf("unexpected response body: %s", body)
 	}
 }
+
