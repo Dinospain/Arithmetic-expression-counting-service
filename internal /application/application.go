@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"ggithub.com/Dinospain/Arithmetic-expression-counting-service/pkg/calculation"
+	"github.com/Dinospain/Arithmetic-expression-counting-service/pkg/calculation"
 )
 
 type Config struct {
