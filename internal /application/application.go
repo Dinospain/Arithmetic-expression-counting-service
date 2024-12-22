@@ -37,8 +37,6 @@ func New() *Application {
 }
 
 // Функция запуска приложения
-// тут будем чиать введенную строку и после нажатия ENTER писать результат работы программы на экране
-// если пользователь ввел exit - то останаваливаем приложение
 func (a *Application) Run() error {
 	for {
 		// читаем выражение для вычисления из командной строки
@@ -46,19 +44,23 @@ func (a *Application) Run() error {
 		reader := bufio.NewReader(os.Stdin)
 		text, err := reader.ReadString('\n')
 		if err != nil {
-			log.Println("failed to read expression from console")
+			log.Println("failed to read expression from console:", err)
+			continue
 		}
-		// убираем пробелы, чтобы оставить только вычислемое выражение
+
+		// убираем пробелы, чтобы оставить только вычисляемое выражение
 		text = strings.TrimSpace(text)
+
 		// выходим, если ввели команду "exit"
 		if text == "exit" {
-			log.Println("aplication was successfully closed")
+			log.Println("application was successfully closed")
 			return nil
 		}
-		//вычисляем выражение
+
+		// вычисляем выражение
 		result, err := calculation.Calc(text)
 		if err != nil {
-			log.Println(text, " calculation failed wit error: ", err)
+			log.Println(text, "calculation failed with error:", err)
 		} else {
 			log.Println(text, "=", result)
 		}
@@ -70,7 +72,7 @@ type Request struct {
 }
 
 func CalcHandler(w http.ResponseWriter, r *http.Request) {
-	request := new(Request)
+	var request Request
 	defer r.Body.Close()
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -81,11 +83,10 @@ func CalcHandler(w http.ResponseWriter, r *http.Request) {
 	result, err := calculation.Calc(request.Expression)
 	if err != nil {
 		if errors.Is(err, calculation.ErrInvalidExpression) {
-			fmt.Fprintf(w, "err: %s", err.Error())
+			http.Error(w, "err: calculation failed", http.StatusBadRequest)
 		} else {
-			fmt.Fprintf(w, "unknown err")
+			http.Error(w, "unknown error", http.StatusInternalServerError)
 		}
-
 	} else {
 		fmt.Fprintf(w, "result: %f", result)
 	}
@@ -95,3 +96,4 @@ func (a *Application) RunServer() error {
 	http.HandleFunc("/", CalcHandler)
 	return http.ListenAndServe(":"+a.config.Addr, nil)
 }
+
